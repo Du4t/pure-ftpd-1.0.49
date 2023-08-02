@@ -1,0 +1,6 @@
+libpureftpd_a-crypto-md5.o: crypto-md5.c /usr/include/stdc-predef.h \
+ ../config.h
+
+/usr/include/stdc-predef.h:
+
+../config.h:
