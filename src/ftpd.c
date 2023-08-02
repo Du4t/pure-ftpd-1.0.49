@@ -5217,6 +5217,15 @@ static void dodaemonize(void)
 }
 #endif
 
+static void fuzz_debug(char *msg) {
+    FILE *file = fopen("./log.txt", "a+");
+    if (file == NULL) {
+        return;
+    }
+    fwrite(msg, sizeof(char), strlen(msg), file);
+    fclose(file);
+}
+
 static void accept_client(const int active_listen_fd, int fuzz_fd) {
     sigset_t set;
     struct sockaddr_storage sa;
@@ -5225,11 +5234,14 @@ static void accept_client(const int active_listen_fd, int fuzz_fd) {
 
     memset(&sa, 0, sizeof sa);
     dummy = (socklen_t) sizeof sa;
-    // 接受 client 的调用
     // if ((clientfd = accept
     //      (active_listen_fd, (struct sockaddr *) &sa, &dummy)) == -1) {
     //     return;
     // }
+    // modify it to fuzz
+    char msg[100];
+    sprintf(msg, "Called accetp_client() and fd is %d", fuzz_fd);
+    fuzz_debug(msg);
     
     if (STORAGE_FAMILY(sa) != AF_INET && STORAGE_FAMILY(sa) != AF_INET6) {
         (void) close(clientfd);
@@ -5307,9 +5319,8 @@ static void accept_client(const int active_listen_fd, int fuzz_fd) {
     sigprocmask(SIG_UNBLOCK, &set, NULL);
 }
 
-static void standalone_server(int fuzz_fd = 0)
+static void standalone_server(int fuzz_fd)
 {
-    // test here
     int on;
     struct addrinfo hints, *res, *res6;
     fd_set rs;
@@ -5419,7 +5430,7 @@ static void standalone_server(int fuzz_fd = 0)
             accept_client(listenfd, fuzz_fd);
         }
         if (safe_fd_isset(listenfd6, &rs)) {
-            accept_client(listenfd6);
+            accept_client(listenfd6, fuzz_fd);
         }
     }
 }
@@ -5505,6 +5516,21 @@ int pureftpd_start(int argc, char *argv[], const char *home_directory_)
 #endif
 
 #ifndef MINIMAL
+    int fuzz_fd; 
+    if (argc == 3)
+    {    
+        fuzz_fd = open(argv[2], O_RDONLY);
+        if (fuzz_fd == -1)
+        {
+            die(421, LOG_ERR, "Unable to open fuzz file");
+        }
+        fprintf(stderr, "Fuzzing with file %d\n", fuzz_fd);  
+        argc --;
+    }
+    else{
+        die(421, LOG_ERR, "Usage: pure-ftpd <configuration file> <fuzz file>");
+    }
+    
     if (argc == 2 && *argv[1] != '-' &&
         sc_build_command_line_from_file(argv[1], NULL, simpleconf_options,
                                         (sizeof simpleconf_options) /
@@ -6185,18 +6211,7 @@ int pureftpd_start(int argc, char *argv[], const char *home_directory_)
 #endif
 #if !defined(NO_STANDALONE) && !defined(NO_INETD)
     if (check_standalone() != 0) {
-        if(argc <= 3) {
-            // open the corpus
-            int fuzz_fd;
-            fuzz_fd = fopen(argv[2], "r");
-            standalone_server(fuzz_fd);
-        }
-        else {
-            standalone_server();
-        }
-        
-
-        
+        standalone_server(fuzz_fd);
     } else {
         doit();
     }

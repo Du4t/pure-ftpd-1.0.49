@@ -1676,6 +1676,10 @@ configure:7248: checking for sys/ptrace.h
 configure:7248: result: yes
 configure:7261: checking security/pam_appl.h usability
 configure:7261: gcc -c -g -O2 -fPIC -fPIE -fwrapv -fno-strict-aliasing -fno-strict-overflow -fstack-protector-all -Winit-self -Wwrite-strings -Wdiv-by-zero -Wno-unused-command-line-argument  -I/usr/local/include -D_FORTIFY_SOURCE=2 conftest.c >&5
+conftest.c:85:10: fatal error: security/pam_appl.h: No such file or directory
+ #include <security/pam_appl.h>
+          ^~~~~~~~~~~~~~~~~~~~~
+compilation terminated.
 configure:7261: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2614,6 +2618,10 @@ configure:7287: checking for pam/pam_misc.h
 configure:7287: result: no
 configure:7287: checking pam/pam_modules.h usability
 configure:7287: gcc -c -g -O2 -fPIC -fPIE -fwrapv -fno-strict-aliasing -fno-strict-overflow -fstack-protector-all -Winit-self -Wwrite-strings -Wdiv-by-zero -Wno-unused-command-line-argument  -I/usr/local/include -D_FORTIFY_SOURCE=2 conftest.c >&5
+conftest.c:85:10: fatal error: pam/pam_modules.h: No such file or directory
+ #include <pam/pam_modules.h>
+          ^~~~~~~~~~~~~~~~~~~
+compilation terminated.
 configure:7287: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -6024,7 +6032,7 @@ configure: failed program was:
 configure:9644: result: no
 configure:9651: checking for sendfilev
 configure:9651: gcc -o conftest -g -O2 -fPIC -fPIE -fwrapv -fno-strict-aliasing -fno-strict-overflow -fstack-protector-all -Winit-self -Wwrite-strings -Wdiv-by-zero -Wno-unused-command-line-argument  -I/usr/local/include -D_FORTIFY_SOURCE=2  -pie -Wl,-z,relro -Wl,-z,now -Wl,-z,noexecstack -L/usr/local/lib conftest.c  >&5
-/tmp/cca3Lntt.o: In function `main':
+/tmp/cc0S0WAR.o: In function `main':
 /media/psf/Home/Desktop/Fuzz/Binarys/pure-ftpd-1.0.49/conftest.c:110: undefined reference to `sendfilev'
 collect2: error: ld returned 1 exit status
 configure:9651: $? = 1
@@ -6537,7 +6545,7 @@ configure:10774: $? = 0
 configure:10774: result: yes
 configure:10780: checking for _doprnt
 configure:10780: gcc -o conftest -g -O2 -fPIC -fPIE -fwrapv -fno-strict-aliasing -fno-strict-overflow -fstack-protector-all -Winit-self -Wwrite-strings -Wdiv-by-zero -Wno-unused-command-line-argument  -I/usr/local/include -D_FORTIFY_SOURCE=2  -pie -Wl,-z,relro -Wl,-z,now -Wl,-z,noexecstack -L/usr/local/lib conftest.c -lcrypt  >&5
-/tmp/ccxSKSVk.o: In function `main':
+/tmp/ccp0DRYH.o: In function `main':
 /media/psf/Home/Desktop/Fuzz/Binarys/pure-ftpd-1.0.49/conftest.c:136: undefined reference to `_doprnt'
 collect2: error: ld returned 1 exit status
 configure:10780: $? = 1
@@ -6959,7 +6967,7 @@ configure:10830: $? = 0
 configure:10830: result: yes
 configure:10841: checking for pstat_getdynamic
 configure:10841: gcc -o conftest -g -O2 -fPIC -fPIE -fwrapv -fno-strict-aliasing -fno-strict-overflow -fstack-protector-all -Winit-self -Wwrite-strings -Wdiv-by-zero -Wno-unused-command-line-argument  -I/usr/local/include -D_FORTIFY_SOURCE=2  -pie -Wl,-z,relro -Wl,-z,now -Wl,-z,noexecstack -L/usr/local/lib conftest.c -lcrypt  >&5
-/tmp/ccZnrXuF.o: In function `main':
+/tmp/ccFok4A2.o: In function `main':
 /media/psf/Home/Desktop/Fuzz/Binarys/pure-ftpd-1.0.49/conftest.c:140: undefined reference to `pstat_getdynamic'
 collect2: error: ld returned 1 exit status
 configure:10841: $? = 1
@@ -7673,7 +7681,7 @@ configure:12467: $? = 0
 configure:12467: result: yes
 configure:12467: checking for setproctitle
 configure:12467: gcc -o conftest -g -O2 -fPIC -fPIE -fwrapv -fno-strict-aliasing -fno-strict-overflow -fstack-protector-all -Winit-self -Wwrite-strings -Wdiv-by-zero -Wno-unused-command-line-argument  -I/usr/local/include -D_FORTIFY_SOURCE=2  -pie -Wl,-z,relro -Wl,-z,now -Wl,-z,noexecstack -L/usr/local/lib conftest.c -lcrypt  >&5
-/tmp/cci7VC2B.o: In function `main':
+/tmp/ccOBwTaY.o: In function `main':
 /media/psf/Home/Desktop/Fuzz/Binarys/pure-ftpd-1.0.49/conftest.c:160: undefined reference to `setproctitle'
 collect2: error: ld returned 1 exit status
 configure:12467: $? = 1
@@ -7918,7 +7926,7 @@ configure:12515: $? = 0
 configure:12515: result: yes
 configure:12527: checking for strlcpy
 configure:12527: gcc -o conftest -g -O2 -fPIC -fPIE -fwrapv -fno-strict-aliasing -fno-strict-overflow -fstack-protector-all -Winit-self -Wwrite-strings -Wdiv-by-zero -Wno-unused-command-line-argument  -I/usr/local/include -D_FORTIFY_SOURCE=2  -pie -Wl,-z,relro -Wl,-z,now -Wl,-z,noexecstack -L/usr/local/lib conftest.c -lcrypt  >&5
-/tmp/ccH1WEwL.o: In function `main':
+/tmp/ccfTZTh8.o: In function `main':
 /media/psf/Home/Desktop/Fuzz/Binarys/pure-ftpd-1.0.49/conftest.c:179: undefined reference to `strlcpy'
 collect2: error: ld returned 1 exit status
 configure:12527: $? = 1
@@ -8108,7 +8116,7 @@ configure: failed program was:
 configure:12527: result: no
 configure:12527: checking for strlcat
 configure:12527: gcc -o conftest -g -O2 -fPIC -fPIE -fwrapv -fno-strict-aliasing -fno-strict-overflow -fstack-protector-all -Winit-self -Wwrite-strings -Wdiv-by-zero -Wno-unused-command-line-argument  -I/usr/local/include -D_FORTIFY_SOURCE=2  -pie -Wl,-z,relro -Wl,-z,now -Wl,-z,noexecstack -L/usr/local/lib conftest.c -lcrypt  >&5
-/tmp/cclNbU9P.o: In function `main':
+/tmp/ccNcwWVd.o: In function `main':
 /media/psf/Home/Desktop/Fuzz/Binarys/pure-ftpd-1.0.49/conftest.c:179: undefined reference to `strlcat'
 collect2: error: ld returned 1 exit status
 configure:12527: $? = 1
@@ -8322,7 +8330,7 @@ configure:12539: $? = 0
 configure:12539: result: yes
 configure:12539: checking for mapviewoffile
 configure:12539: gcc -o conftest -g -O2 -fPIC -fPIE -fwrapv -fno-strict-aliasing -fno-strict-overflow -fstack-protector-all -Winit-self -Wwrite-strings -Wdiv-by-zero -Wno-unused-command-line-argument  -I/usr/local/include -D_FORTIFY_SOURCE=2  -pie -Wl,-z,relro -Wl,-z,now -Wl,-z,noexecstack -L/usr/local/lib conftest.c -lcrypt  >&5
-/tmp/ccJz14wc.o: In function `main':
+/tmp/cczc7lXz.o: In function `main':
 /media/psf/Home/Desktop/Fuzz/Binarys/pure-ftpd-1.0.49/conftest.c:183: undefined reference to `mapviewoffile'
 collect2: error: ld returned 1 exit status
 configure:12539: $? = 1
@@ -8602,7 +8610,7 @@ configure:12599: $? = 0
 configure:12599: result: yes
 configure:12599: checking for srandomdev
 configure:12599: gcc -o conftest -g -O2 -fPIC -fPIE -fwrapv -fno-strict-aliasing -fno-strict-overflow -fstack-protector-all -Winit-self -Wwrite-strings -Wdiv-by-zero -Wno-unused-command-line-argument  -I/usr/local/include -D_FORTIFY_SOURCE=2  -pie -Wl,-z,relro -Wl,-z,now -Wl,-z,noexecstack -L/usr/local/lib conftest.c -lcrypt  >&5
-/tmp/cc0wDvEJ.o: In function `main':
+/tmp/ccu43bmT.o: In function `main':
 /media/psf/Home/Desktop/Fuzz/Binarys/pure-ftpd-1.0.49/conftest.c:202: undefined reference to `srandomdev'
 collect2: error: ld returned 1 exit status
 configure:12599: $? = 1
@@ -8815,7 +8823,7 @@ configure: failed program was:
 configure:12599: result: no
 configure:12599: checking for arc4random
 configure:12599: gcc -o conftest -g -O2 -fPIC -fPIE -fwrapv -fno-strict-aliasing -fno-strict-overflow -fstack-protector-all -Winit-self -Wwrite-strings -Wdiv-by-zero -Wno-unused-command-line-argument  -I/usr/local/include -D_FORTIFY_SOURCE=2  -pie -Wl,-z,relro -Wl,-z,now -Wl,-z,noexecstack -L/usr/local/lib conftest.c -lcrypt  >&5
-/tmp/cc0UGEoP.o: In function `main':
+/tmp/cclxTkIL.o: In function `main':
 /media/psf/Home/Desktop/Fuzz/Binarys/pure-ftpd-1.0.49/conftest.c:202: undefined reference to `arc4random'
 collect2: error: ld returned 1 exit status
 configure:12599: $? = 1
@@ -9028,7 +9036,7 @@ configure: failed program was:
 configure:12599: result: no
 configure:12599: checking for arc4random_stir
 configure:12599: gcc -o conftest -g -O2 -fPIC -fPIE -fwrapv -fno-strict-aliasing -fno-strict-overflow -fstack-protector-all -Winit-self -Wwrite-strings -Wdiv-by-zero -Wno-unused-command-line-argument  -I/usr/local/include -D_FORTIFY_SOURCE=2  -pie -Wl,-z,relro -Wl,-z,now -Wl,-z,noexecstack -L/usr/local/lib conftest.c -lcrypt  >&5
-/tmp/cckEkEVT.o: In function `main':
+/tmp/ccJtkCAR.o: In function `main':
 /media/psf/Home/Desktop/Fuzz/Binarys/pure-ftpd-1.0.49/conftest.c:202: undefined reference to `arc4random_stir'
 collect2: error: ld returned 1 exit status
 configure:12599: $? = 1
@@ -9241,7 +9249,7 @@ configure: failed program was:
 configure:12599: result: no
 configure:12599: checking for arc4random_addrandom
 configure:12599: gcc -o conftest -g -O2 -fPIC -fPIE -fwrapv -fno-strict-aliasing -fno-strict-overflow -fstack-protector-all -Winit-self -Wwrite-strings -Wdiv-by-zero -Wno-unused-command-line-argument  -I/usr/local/include -D_FORTIFY_SOURCE=2  -pie -Wl,-z,relro -Wl,-z,now -Wl,-z,noexecstack -L/usr/local/lib conftest.c -lcrypt  >&5
-/tmp/cc3DFPaO.o: In function `main':
+/tmp/ccTNDedW.o: In function `main':
 /media/psf/Home/Desktop/Fuzz/Binarys/pure-ftpd-1.0.49/conftest.c:202: undefined reference to `arc4random_addrandom'
 collect2: error: ld returned 1 exit status
 configure:12599: $? = 1
@@ -9454,7 +9462,7 @@ configure: failed program was:
 configure:12599: result: no
 configure:12611: checking for closefrom
 configure:12611: gcc -o conftest -g -O2 -fPIC -fPIE -fwrapv -fno-strict-aliasing -fno-strict-overflow -fstack-protector-all -Winit-self -Wwrite-strings -Wdiv-by-zero -Wno-unused-command-line-argument  -I/usr/local/include -D_FORTIFY_SOURCE=2  -pie -Wl,-z,relro -Wl,-z,now -Wl,-z,noexecstack -L/usr/local/lib conftest.c -lcrypt  >&5
-/tmp/ccFKFV4S.o: In function `main':
+/tmp/ccN2ugK0.o: In function `main':
 /media/psf/Home/Desktop/Fuzz/Binarys/pure-ftpd-1.0.49/conftest.c:202: undefined reference to `closefrom'
 collect2: error: ld returned 1 exit status
 configure:12611: $? = 1
@@ -9671,7 +9679,7 @@ configure:12611: $? = 0
 configure:12611: result: yes
 configure:12611: checking for getpwnam_shadow
 configure:12611: gcc -o conftest -g -O2 -fPIC -fPIE -fwrapv -fno-strict-aliasing -fno-strict-overflow -fstack-protector-all -Winit-self -Wwrite-strings -Wdiv-by-zero -Wno-unused-command-line-argument  -I/usr/local/include -D_FORTIFY_SOURCE=2  -pie -Wl,-z,relro -Wl,-z,now -Wl,-z,noexecstack -L/usr/local/lib conftest.c -lcrypt  >&5
-/tmp/ccV8s3I3.o: In function `main':
+/tmp/ccLuEW0b.o: In function `main':
 /media/psf/Home/Desktop/Fuzz/Binarys/pure-ftpd-1.0.49/conftest.c:203: undefined reference to `getpwnam_shadow'
 collect2: error: ld returned 1 exit status
 configure:12611: $? = 1
