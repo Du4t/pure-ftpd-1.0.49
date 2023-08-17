@@ -106,7 +106,7 @@ void tls_extcert_get(CertResult * const result, const char *sni_name)
         close(kindy);
         kindy = -1;
         if (tries > 0) {
-            sleep(EXTCERT_MAX_CONNECT_DELAY);
+            // sleep(EXTCERT_MAX_CONNECT_DELAY);
             tries--;
             goto tryagain;
         }

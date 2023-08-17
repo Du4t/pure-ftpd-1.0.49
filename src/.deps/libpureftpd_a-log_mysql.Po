@@ -1,6 +1,7 @@
-libpureftpd_a-log_mysql.o: log_mysql.c /usr/include/stdc-predef.h \
- ../config.h
+libpureftpd_a-log_mysql.o: \
+  /home/du4t/Documents/clang+llvm-11.1.0/lib/clang/11.1.0/share/asan_blacklist.txt \
+  log_mysql.c config.h
 
-/usr/include/stdc-predef.h:
+/home/du4t/Documents/clang+llvm-11.1.0/lib/clang/11.1.0/share/asan_blacklist.txt:
 
-../config.h:
+config.h:

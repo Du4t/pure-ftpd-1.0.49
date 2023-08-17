@@ -1,6 +1,7 @@
-libpureftpd_a-crypto-md5.o: crypto-md5.c /usr/include/stdc-predef.h \
- ../config.h
+libpureftpd_a-crypto-md5.o: \
+  /home/du4t/Documents/clang+llvm-11.1.0/lib/clang/11.1.0/share/asan_blacklist.txt \
+  crypto-md5.c config.h
 
-/usr/include/stdc-predef.h:
+/home/du4t/Documents/clang+llvm-11.1.0/lib/clang/11.1.0/share/asan_blacklist.txt:
 
-../config.h:
+config.h:

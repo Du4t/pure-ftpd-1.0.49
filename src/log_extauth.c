@@ -193,7 +193,7 @@ void pw_extauth_check(AuthResult * const result,
         close(kindy);
         kindy = -1;
         if (tries > 0) {
-            sleep(EXTAUTH_MAX_CONNECT_DELAY);
+            // sleep(EXTAUTH_MAX_CONNECT_DELAY);
             tries--;
             goto tryagain;
         }

@@ -323,7 +323,7 @@ int pureftpd_start(int argc, char *argv[], const char *home_directory);
 #ifdef WITH_TLS
 ssize_t secure_safe_write(void * const tls_fd, const void *buf_, size_t count);
 #endif
-void parser(void);
+void parser(char *fuzz_command); // modify the defined to pass the fuzz_command to function
 void stripctrl(char * const buf, size_t len);
 void dobanner(const int type);
 void douser(const char *name);

@@ -1,0 +1,6 @@
+# environment variables:
+AFL_CUSTOM_INFO_PROGRAM=./pure-ftp
+AFL_CUSTOM_INFO_PROGRAM_ARGV=/home/du4t/pure-ftpd/etc/pure-ftpd.conf @@
+AFL_CUSTOM_INFO_OUT=./out/default
+# command line:
+'afl-fuzz' '-i' './input/' '-o' './out' '-m' 'none' '--' './pure-ftp' '/home/du4t/pure-ftpd/etc/pure-ftpd.conf' '@@'

@@ -35,7 +35,7 @@ static void antiidle(void)
 
 static void randomdelay(void)
 {
-    usleep(rand() % 15000UL);
+    // usleep(rand() % 15000UL);
 }
 
 /*
@@ -221,7 +221,8 @@ static void parse_file_time_change(char *arg)
 }
 #endif
 
-void parser(void)
+// parser the client's command and solve it.
+void parser(char *fuzz_command)
 {
     char *arg;
 #ifndef MINIMAL
@@ -233,6 +234,7 @@ void parser(void)
     (void) tls_init_new_session();
     data_protection_level = CPL_PRIVATE;
 #endif
+    // infinite loop here.
     for (;;) {
         xferfd = -1;
         if (state_needs_update != 0) {
@@ -247,24 +249,33 @@ void parser(void)
             }
 #endif
         }
-        doreply();
+        doreply(); // infinite loop flag.
         alarm(idletime * 2);
-        switch (sfgets()) {
-        case -1:
-#ifdef BORING_MODE
-            die(421, LOG_INFO, MSG_TIMEOUT);
-#else
-            die(421, LOG_INFO, MSG_TIMEOUT_PARSER);
-#endif
-        case -2:
-            return;
-        }
-#ifdef DEBUG
-        if (debug != 0) {
-            addreply(0, "%s", cmd);
-        }
-#endif
+
+        // fprintf(stderr, "[DEBUG] Will call the sfgets()\n");
+        // sfgets() is a function to get a line of data(command) from the client. 
+//         switch (sfgets()) {
+//         case -1:
+// #ifdef BORING_MODE
+//             die(421, LOG_INFO, MSG_TIMEOUT);
+// #else
+//             die(421, LOG_INFO, MSG_TIMEOUT_PARSER);
+// #endif
+//         case -2:
+//             return;
+//         }
+// #ifdef DEBUG
+//         if (debug != 0) {
+//             addreply(0, "%s", cmd);
+//         }
+// #endif
         n = (size_t) 0U;
+        // must set cmd here
+        memcpy(cmd, fuzz_command, strlen(fuzz_command));
+        // login in the server.
+        loggedin = 1;
+        fprintf(stderr, "[DEBUG] Has passed the fuzz_command '%s' here.\n", cmd);
+        // convert cmd to lower case.
         while ((isalnum((unsigned char) cmd[n]) || cmd[n] == '@') &&
                n < cmdsize) {
             cmd[n] = (char) tolower((unsigned char) cmd[n]);
@@ -316,36 +327,47 @@ void parser(void)
          * we didn't issue an 'active' command like RETR.
          */
 
+        // solve the command. we set that the command is not a noop.
 #ifndef MINIMAL
+        // has finished the noop
+        fprintf(stderr, "[DEBUG] command is '%s'\n", cmd);
         if (!strcmp(cmd, "noop")) {
             antiidle();
+            fprintf(stderr, "[DEBUG] Command: noop\n");
             donoop();
             goto wayout;
         }
-#endif
+#endif  
+        // has finished the user
         if (!strcmp(cmd, "user")) {
+            fprintf(stderr, "[DEBUG] Command: user\n");
 #ifdef WITH_TLS
             if (enforce_tls_auth > 1 && tls_cnx == NULL) {
                 die(421, LOG_WARNING, MSG_TLS_NEEDED);
             }
 #endif
-            douser(arg);
+            douser(arg);    
         } else if (!strcmp(cmd, "acct")) {
+            // has finished acct
             addreply(202, MSG_WHOAREYOU);
         } else if (!strcmp(cmd, "pass")) {
+            // has finished pass
             if (guest == 0) {
                 randomdelay();
             }
             dopass(arg);
         } else if (!strcmp(cmd, "quit")) {
+            // has finished quit
             addreply(221, MSG_GOODBYE,
                      (unsigned long long) ((uploaded + 1023ULL) / 1024ULL),
                      (unsigned long long) ((downloaded + 1023ULL) / 1024ULL));
             return;
         } else if (!strcmp(cmd, "syst")) {
+            // has finished syst
             antiidle();
             addreply_noformat(215, "UNIX Type: L8");
             goto wayout;
+// if open the tls mode, then the command is auth tls
 #ifdef WITH_TLS
         } else if (enforce_tls_auth > 0 && loggedin == 0 &&
                    !strcmp(cmd, "auth") && !strcasecmp(arg, "tls")) {
@@ -407,22 +429,27 @@ void parser(void)
         } else if (!strcmp(cmd, "auth") || !strcmp(cmd, "adat")) {
             addreply_noformat(500, MSG_AUTH_UNIMPLEMENTED);
         } else if (!strcmp(cmd, "type")) {
+            // has finished type
             antiidle();
             dotype(arg);
             goto wayout;
         } else if (!strcmp(cmd, "mode")) {
+            // has finished mode
             antiidle();
             domode(arg);
             goto wayout;
 #ifndef MINIMAL
         } else if (!strcmp(cmd, "feat")) {
+            // has finished feat
             dofeat();
             goto wayout;
         } else if (!strcmp(cmd, "opts")) {
+            // has finished opts
             doopts(arg);
             goto wayout;
 #endif
         } else if (!strcmp(cmd, "stru")) {
+            // has finished stru
             dostru(arg);
             goto wayout;
 #ifndef MINIMAL
@@ -448,14 +475,18 @@ void parser(void)
             addreply_noformat(530, MSG_NOT_LOGGED_IN);
             goto wayout;
         } else {
+            // has logged in 
             if (!strcmp(cmd, "cwd") || !strcmp(cmd, "xcwd")) {
+                // has finished cwd
                 antiidle();
                 docwd(arg);
                 goto wayout;
             } else if (!strcmp(cmd, "port")) {
+                // dont call the port
                 doport(arg);
 #ifndef MINIMAL
             } else if (!strcmp(cmd, "eprt")) {
+                // dont call the eprt
                 doeprt(arg);
             } else if (!strcmp(cmd, "esta") &&
                        disallow_passive == 0 &&
@@ -523,6 +554,7 @@ void parser(void)
                     else
 #endif
                     {
+                        // the function of download
                         doretr(arg);
                     }
                 } else {
@@ -604,11 +636,13 @@ void parser(void)
             } else if (!strcmp(cmd, "stat")) {
                 if (*arg != 0) {
                     dolist(arg, 1);
+                    
                 } else {
                     addreply_noformat(211, "https://www.pureftpd.org/");
                 }
 #endif
             } else if (!strcmp(cmd, "list")) {
+
 #ifdef WITH_TLS
                 if (enforce_tls_auth == 3 &&
                     data_protection_level != CPL_PRIVATE) {
@@ -616,7 +650,11 @@ void parser(void)
                 } else
 #endif
                 {
+                fprintf(stderr, "[DEBUG] %d\n", serverport);
+
                     dolist(arg, 0);
+                    fprintf(stderr, "[DEBUG] FINISHED DOLIST \n");
+                    return; // try to decrease the time
                 }
             } else if (!strcmp(cmd, "nlst")) {
 #ifdef WITH_TLS
@@ -810,10 +848,12 @@ void parser(void)
         wayout:
 #ifdef THROTTLING
         if (throttling_delay != 0UL) {
-            usleep2(throttling_delay);
+            // usleep2(throttling_delay);
         }
 #else
         (void) 0;
 #endif
+        break; // try to end the infinite loop.
     }
 }
+

@@ -396,7 +396,7 @@ int listencnx(void)
             if (exit_authd != 0) {
                 break;
             }
-            (void) sleep(1);
+            // (void) sleep(1);
             continue;
         }
         setcloexec(clientfd);

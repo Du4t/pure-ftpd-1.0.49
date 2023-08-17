@@ -46,6 +46,13 @@
 #ifdef WITH_DMALLOC
 # include <dmalloc.h>
 #endif
+#define DEBUG_PRINT() debugPrint(__FUNCTION__)
+char *fuzz_command;
+
+
+void debugPrint(const char* functionName) {
+    fprintf(stderr, "[DEBUG] Has Called in the %s\n", functionName);
+}
 
 void disablesignals(void)
 {
@@ -67,7 +74,7 @@ static void enablesignals(void)
 void usleep2(const unsigned long microsec)
 {
     disablesignals();
-    usleep(microsec);
+    // usleep(microsec);
     enablesignals();
 }
 
@@ -189,7 +196,7 @@ static int init_tz(void)
 void simplify(char *subdir)
 {
     char *a;
-
+    fprintf(stderr, "[DEBUG] subdir is %s\n", subdir);
     if (subdir == NULL || *subdir == 0) {
         return;
     }
@@ -235,6 +242,7 @@ void simplify(char *subdir)
             while (*a == '/') {
                 a++;
             }
+            fprintf(stderr, "[DEBUG] a is %d\n", *a);
             overlapcpy(subdir, a);
         }
     }
@@ -242,6 +250,7 @@ void simplify(char *subdir)
         return;
     }
     a = subdir + strlen(subdir) - (size_t) 1U;
+
     if (*a != '.' || a == subdir) {
         return;
     }
@@ -463,7 +472,7 @@ static void clearargs(int argc, char **argv)
             first = argv[i];
         }
         if (next == NULL || argv[i] == next + 1) {
-            next = argv[i] + strlen(argv[i]);
+            next = argv[i] + strlen(argv[i]); 
         }
     }
     if (first == NULL || next == NULL) {
@@ -744,8 +753,9 @@ void doreply(void)
 {
     struct reply *scannedentry;
     struct reply *nextentry;
-
+    fprintf(stderr, "[DEBUG] Called the doreply \n");
     if ((scannedentry = firstreply) == NULL) {
+        fprintf(stderr, "[DEBUG] exit here\n");
         return;
     }
     do {
@@ -776,6 +786,8 @@ void doreply(void)
         free(scannedentry);
     } while ((scannedentry = nextentry) != NULL);
     firstreply = lastreply = NULL;
+    fprintf(stderr, "[DEBUG] Has finished the doreply\n");
+
 }
 
 /* Check whether a file name is valid. Files names starting
@@ -1190,7 +1202,7 @@ void domlst(const char * const file)
 void donoop(void)
 {
 #ifdef BORING_MODE
-    addreply_noformat(200, "dc.w $4E71");
+    addreply_noformat(200, "dc.w $4E71"); 
 #else
     addreply_noformat(200, MSG_SLEEPING);
 #endif
@@ -1280,7 +1292,7 @@ static int doinitsupgroups(const char *user, const uid_t uid, const gid_t gid)
 void douser(const char *username)
 {
     struct passwd *pw = NULL;
-
+    fprintf(stderr, "[DEBUG] Has Called the douser and the username is %s\n", username);
     if (loggedin) {
         if (username) {
             if (!guest) {
@@ -1295,9 +1307,14 @@ void douser(const char *username)
         }
         return;
     }
+        fprintf(stderr, "[DEBUG] The anon_only is %d!\n", anon_only);
+
+    // solve the anonymous login problem
     if (anon_only <= 0 && username != NULL && *username != 0 &&
         (anon_only < 0 || (strcasecmp(username, "ftp") &&
                            strcasecmp(username, "anonymous")))) {
+        fprintf(stderr, "[DEBUG] Here!\n");
+
         strncpy(account, username, sizeof(account) - 1);
         account[sizeof(account) - (size_t) 1U] = 0;
         addreply(331, MSG_USER_OK, account);
@@ -1366,13 +1383,13 @@ void douser(const char *username)
 # endif
 #endif
 #ifdef WITH_VIRTUAL_HOSTS
-        if (getnameinfo((struct sockaddr *) &ctrlconn, STORAGE_LEN(ctrlconn),
-                        hbuf, sizeof hbuf, NULL,
-                        (size_t) 0U, NI_NUMERICHOST) != 0
-            || SNCHECK(snprintf(name, sizeof name, VHOST_PATH "/%s", hbuf),
-                       sizeof name)) {
-            _EXIT(EXIT_FAILURE);
-        }
+        // if (getnameinfo((struct sockaddr *) &ctrlconn, STORAGE_LEN(ctrlconn),
+        //                 hbuf, sizeof hbuf, NULL,
+        //                 (size_t) 0U, NI_NUMERICHOST) != 0
+        //     || SNCHECK(snprintf(name, sizeof name, VHOST_PATH "/%s", hbuf),
+        //                sizeof name)) {
+        //     _EXIT(EXIT_FAILURE);
+        // }
         if (chdir(name) != 0)         /* non-virtual */
 #endif
         {
@@ -1483,6 +1500,7 @@ void douser(const char *username)
         user_quota_size = user_quota_files = ULONG_LONG_MAX;
 #endif
     }
+    // set the default path
     if (getcwd(wd, sizeof wd - (size_t) 1U) == NULL) {
         wd[0] = '/';
         wd[1] = 0;
@@ -1679,8 +1697,8 @@ static int create_home_and_chdir(const char * const home)
 }
 
 static void randomsleep(unsigned int t) {
-    usleep2((unsigned long) (zrand() % PASSWD_FAILURE_DELAY));
-    usleep2(t * PASSWD_FAILURE_DELAY);
+    // usleep2((unsigned long) (zrand() % PASSWD_FAILURE_DELAY));
+    // usleep2(t * PASSWD_FAILURE_DELAY);
 }
 
 void dopass(char *password)
@@ -1716,6 +1734,7 @@ void dopass(char *password)
         addreply_noformat(530, MSG_LINE_TOO_LONG);
         return;
     }
+    // check the password and the username
     authresult = pw_check(account, password, &ctrlconn, &peer);
     pure_memzero(password, strlen(password));
     if (authresult.auth_ok != 1) {
@@ -2279,7 +2298,7 @@ static int doport3(const int protocol)
             break;
         }
 # ifdef USE_ONLY_FIXED_DATA_PORT
-        (void) sleep(1U);
+        // (void) sleep(1U);
 # else
         if (*portlistpnt == (in_port_t) 0U) {
             goto data_socket_error;
@@ -2464,7 +2483,7 @@ void opendata(void)
 #endif
                  ) && tries > 0UL) {
                 tries--;
-                usleep2(1000000UL);
+                // usleep2(1000000UL);
                 goto again;
             }
             addreply(425, MSG_CNX_PORT_FAILED ": %s",
@@ -4840,7 +4859,6 @@ static void dns_sanitize(char *z)
 static void fill_atomic_prefix(void)
 {
     char tmp_atomic_prefix[PATH_MAX];
-
     snprintf(tmp_atomic_prefix, sizeof tmp_atomic_prefix,
              "%s%lx.%x.%lx.%x",
              ATOMIC_PREFIX_PREFIX,
@@ -4849,80 +4867,93 @@ static void fill_atomic_prefix(void)
              (unsigned long) getpid(),
              zrand());
     if ((atomic_prefix = strdup(tmp_atomic_prefix)) == NULL) {
+        fprintf(stderr, "[DEBUG] Die in the fill_atomic_prefix\n");
         die_mem();
     }
 }
 
-static void doit(void)
+static void doit()
 {
+    // test pass the command to the server
+    // fprintf(stderr, "[DEBUG] Test the fuzz_command is %s\n", fuzz_command);
     socklen_t socksize;
     unsigned int users = 0U;
     int display_banner = 1;
-
+    // fprintf(stderr, "[DEBUG] the client is %d\n", clientfd);    
     client_init_reply_buf();
     session_start_time = time(NULL);
     fixlimits();
 #ifdef F_SETOWN
     fcntl(clientfd, F_SETOWN, getpid());
 #endif
-    set_signals_client();
+
+    set_signals_client(); // set the signal
     alt_arc4random_stir();
     (void) umask((mode_t) 0);
-    socksize = (socklen_t) sizeof ctrlconn;
-    if (getsockname(clientfd, (struct sockaddr *) &ctrlconn, &socksize) != 0) {
-        die(421, LOG_ERR, MSG_NO_SUPERSERVER);
-    }
-    fourinsix(&ctrlconn);
-    if (checkvalidaddr(&ctrlconn) == 0) {
-        die(425, LOG_ERR, MSG_INVALID_IP);
-    }
-    if (STORAGE_FAMILY(ctrlconn) == AF_INET6) {
-        serverport = ntohs((in_port_t) STORAGE_PORT6_CONST(ctrlconn));
-    } else {
-        serverport = ntohs((in_port_t) STORAGE_PORT_CONST(ctrlconn));
-    }
-    if (trustedip != NULL && addrcmp(&ctrlconn, trustedip) != 0) {
-       anon_only = 1;
-    }
-    socksize = (socklen_t) sizeof peer;
-    if (getpeername(clientfd, (struct sockaddr *) &peer, &socksize)) {
-        die(421, LOG_ERR, MSG_GETPEERNAME ": %s" , strerror(errno));
-    }
-    fourinsix(&peer);
-    if (checkvalidaddr(&peer) == 0) {
-        die(425, LOG_ERR, MSG_INVALID_IP);
-    }
-#ifndef DONT_LOG_IP
-    for (;;) {
-        int eai;
+    // socksize = (socklen_t) sizeof ctrlconn;
+    // to solve the problem of ip address. such as covert ipv6 to ipv4.
+    // if (getsockname(clientfd, (struct sockaddr *) &ctrlconn, &socksize) != 0) {
+    //     die(421, LOG_ERR, MSG_NO_SUPERSERVER);
+    // }
+    // fourinsix(&ctrlconn);
+    // if (checkvalidaddr(&ctrlconn) == 0) {
+    //     die(425, LOG_ERR, MSG_INVALID_IP);
+    // }
+    // if (STORAGE_FAMILY(ctrlconn) == AF_INET6) {
+    //     serverport = ntohs((in_port_t) STORAGE_PORT6_CONST(ctrlconn));
+    // } else {
+    //     serverport = ntohs((in_port_t) STORAGE_PORT_CONST(ctrlconn));
+    // }
+    // if (trustedip != NULL && addrcmp(&ctrlconn, trustedip) != 0) {
+    //    anon_only = 1;
+    // }
+    // socksize = (socklen_t) sizeof peer;
+    // if (getpeername(clientfd, (struct sockaddr *) &peer, &socksize)) {
+    //     die(421, LOG_ERR, MSG_GETPEERNAME ": %s" , strerror(errno));
+    // }
+    // fourinsix(&peer);
+    // if (checkvalidaddr(&peer) == 0) {
+    //     die(425, LOG_ERR, MSG_INVALID_IP);
+    // }
 
-        if ((eai = getnameinfo
-             ((struct sockaddr *) &peer, STORAGE_LEN(peer), host,
-              sizeof host, NULL, (size_t) 0U,
-              resolve_hostnames != 0 ? 0 : NI_NUMERICHOST)) == 0) {
-            break;
-        }
-        if (resolve_hostnames != 0 &&
-            getnameinfo
-            ((struct sockaddr *) &peer, STORAGE_LEN(peer), host,
-             sizeof host, NULL, (size_t) 0U, NI_NUMERICHOST) == 0) {
-            break;
-        }
-        die(425, LOG_ERR, MSG_INVALID_IP);
-    }
-#endif
-#ifndef DONT_LOG_IP
-    dns_sanitize(host);
-#else
-    *host = '?';
-    host[1] = 0;
-#endif
-    logfile(LOG_INFO, MSG_NEW_CONNECTION, host);
+// to save the client's ipaddress and hostname. 
+// #ifndef DONT_LOG_IP
+//     for (;;) {
+//         int eai;
+
+//         if ((eai = getnameinfo
+//              ((struct sockaddr *) &peer, STORAGE_LEN(peer), host,
+//               sizeof host, NULL, (size_t) 0U,
+//               resolve_hostnames != 0 ? 0 : NI_NUMERICHOST)) == 0) {
+//             break;
+//         }
+//         if (resolve_hostnames != 0 &&
+//             getnameinfo
+//             ((struct sockaddr *) &peer, STORAGE_LEN(peer), host,
+//              sizeof host, NULL, (size_t) 0U, NI_NUMERICHOST) == 0) {
+//             break;
+//         }
+//         die(425, LOG_ERR, MSG_INVALID_IP);
+//     }
+// #endif
+// #ifndef DONT_LOG_IP
+//     dns_sanitize(host);
+// #else
+    // *host = '?';
+    // host[1] = 0;
+// #endif
+    // logfile(LOG_INFO, MSG_NEW_CONNECTION, host);
+    // fprintf(stderr, "[DEBUG] The client has been accepted\n");
 
     replycode = 220;
 
-    fill_atomic_prefix();
+    // try to create a tmp directory.
 
+    // fprintf(stderr, "[DEBUG] Has called the fill_atomic_prefix\n");
+    fill_atomic_prefix();
+    // fprintf(stderr, "[DEBUG] Has finished the fill_atomic_prefix\n");
+
+    // limit the maxusers
     if (maxusers > 0U) {
 #ifdef NO_STANDALONE
         users = daemons(serverport);
@@ -4944,14 +4975,22 @@ static void doit(void)
         }
     }
     /* It's time to add a new entry to the ftpwho list */
+    /* ftpwho will be recorded the client's ipaddress, session_start_time(connect time) and the pid etc.*/
+    /* to make the program could be fuzz we need to hard code some value.*/
 #ifdef FTPWHO
     {
+        struct sockaddr_storage addr;
+        struct sockaddr_storage ctrlconn;
         ftpwho_initwho();
         if (shm_data_cur != NULL) {
             ftpwho_lock();
             shm_data_cur->pid = getpid();
             shm_data_cur->state = FTPWHO_STATE_IDLE;
-            shm_data_cur->addr = peer;
+            // we need to hard code the peer.
+            // shm_data_cur->addr = peer;
+            shm_data_cur->addr = addr;
+            // we need to hard code the ctrlconn.
+            // shm_data_cur->local_addr = ctrlconn;
             shm_data_cur->local_addr = ctrlconn;
             shm_data_cur->date = session_start_time;
             shm_data_cur->xfer_date = shm_data_cur->date;
@@ -4964,6 +5003,7 @@ static void doit(void)
     }
 #endif
 
+// check the logfile's format.
 #ifdef WITH_ALTLOG
     if (altlog_format != ALTLOG_NONE) {
         if (altlog_format == ALTLOG_W3C) {
@@ -4983,6 +5023,7 @@ static void doit(void)
         }
     }
 #endif
+    // check the system load.
     /* Back to the client - Get the 5 min load average */
     {
         double load_[2];
@@ -5000,24 +5041,33 @@ static void doit(void)
         _EXIT(EXIT_FAILURE);
     }
 #endif
+    // try to enable some algrothim to decrease the delay of server to client.
     {
         int fodder;
-#ifdef IPTOS_LOWDELAY
-        fodder = IPTOS_LOWDELAY;
-        setsockopt(clientfd, SOL_IP, IP_TOS, (char *) &fodder, sizeof fodder);
-#endif
-#ifdef SO_OOBINLINE
-        fodder = 1;
-        setsockopt(clientfd, SOL_SOCKET, SO_OOBINLINE,
-                   (char *) &fodder, sizeof fodder);
-#endif
-#ifdef TCP_NODELAY
-        fodder = 1;
-        setsockopt(clientfd, IPPROTO_TCP, TCP_NODELAY,
-                   (char *) &fodder, sizeof fodder);
-#endif
-        keepalive(clientfd, 0);
+
+// to enable the low delay mode.
+// #ifdef IPTOS_LOWDELAY
+//         fodder = IPTOS_LOWDELAY;
+//         setsockopt(clientfd, SOL_IP, IP_TOS, (char *) &fodder, sizeof fodder);
+// #endif
+
+// to enable the oobinline mode.
+// #ifdef SO_OOBINLINE
+//         fodder = 1;
+//         setsockopt(clientfd, SOL_SOCKET, SO_OOBINLINE,
+//                    (char *) &fodder, sizeof fodder);
+// #endif
+
+// to disable Nagle's algorithm.
+// #ifdef TCP_NODELAY
+//         fodder = 1;
+//         setsockopt(clientfd, IPPROTO_TCP, TCP_NODELAY,
+//                    (char *) &fodder, sizeof fodder);
+// #endif
+//         keepalive(clientfd, 0);
     }
+
+// to create a real random number.
 #ifdef HAVE_SRANDOMDEV
     srandomdev();
 #elif defined (HAVE_RANDOM)
@@ -5025,6 +5075,7 @@ static void doit(void)
 #else
     srand((unsigned int) session_start_time ^ (unsigned int) zrand());
 #endif
+
 #ifdef COOKIE
     if (fortune() > 0) {
         display_banner = 0;
@@ -5084,9 +5135,9 @@ static void doit(void)
     }
     candownload = (signed char) ((maxload <= 0.0) || (load < maxload));
 
+    // pass
     if (force_passive_ip_s != NULL) {
         struct addrinfo hints, *res;
-
         memset(&hints, 0, sizeof hints);
         hints.ai_family = AF_INET;
         hints.ai_addr = NULL;
@@ -5104,12 +5155,11 @@ static void doit(void)
         die(421, LOG_ERR, "privsep_init");
     }
 #endif
-
-    parser();
-
+    // parser() has solve all the command. 
+    parser(fuzz_command);
     addreply(0, MSG_LOGOUT);
     logfile(LOG_INFO, MSG_LOGOUT);
-    doreply();
+    doreply(); // we didnt create a real connection from client to server, so we cant see the message on client.
 #ifdef WITH_BONJOUR
     refreshManager();
 #endif
@@ -5183,7 +5233,6 @@ static void dodaemonize(void)
 {
     pid_t child;
     unsigned int i;
-
     /* Contributed by Jason Lunz - also based on APUI code, see open_max() */
     if (daemonize != 0) {
         if ((child = fork()) == (pid_t) -1) {
@@ -5209,101 +5258,107 @@ static void dodaemonize(void)
             }
             i--;
         } while (i > 2U);
-        if (closedesc_all(1) != 0) {
-            perror(MSG_STANDALONE_FAILED " - /dev/null duplication");
-            _EXIT(EXIT_FAILURE);
-        }
+        // closedesc_all will close all the child's output
+        // if (closedesc_all(1) != 0) {
+        //     perror(MSG_STANDALONE_FAILED " - /dev/null duplication");
+        //     _EXIT(EXIT_FAILURE);
+        // }
     }
 }
 #endif
 
-static void fuzz_debug(char *msg) {
-    FILE *file = fopen("./log.txt", "a+");
-    if (file == NULL) {
-        return;
-    }
-    fwrite(msg, sizeof(char), strlen(msg), file);
-    fclose(file);
-}
 
-static void accept_client(const int active_listen_fd, int fuzz_fd) {
+static void accept_client(const int active_listen_fd, int fuzz_fd, char * fuzz_command) {
     sigset_t set;
     struct sockaddr_storage sa;
     socklen_t dummy;
     pid_t child;
-
     memset(&sa, 0, sizeof sa);
     dummy = (socklen_t) sizeof sa;
     // if ((clientfd = accept
     //      (active_listen_fd, (struct sockaddr *) &sa, &dummy)) == -1) {
     //     return;
     // }
+
     // modify it to fuzz
-    char msg[100];
-    sprintf(msg, "Called accetp_client() and fd is %d", fuzz_fd);
-    fuzz_debug(msg);
-    
-    if (STORAGE_FAMILY(sa) != AF_INET && STORAGE_FAMILY(sa) != AF_INET6) {
-        (void) close(clientfd);
-        clientfd = -1;
-        return;
-    }
-    if (maxusers > 0U && nb_children >= maxusers) {
-        char line[1024];
+    fprintf(stderr, "[DEBUG] Has called accetp_client and fuzz_fd: %d, fuzz_command is %s\n", fuzz_fd, fuzz_command);
+    clientfd = fuzz_fd;
 
-        snprintf(line, sizeof line, "421 " MSG_MAX_USERS "\r\n",
-                 (unsigned long) maxusers);
-        /* No need to check a return value to say 'f*ck' */
-        (void) fcntl(clientfd, F_SETFL, fcntl(clientfd, F_GETFL) | O_NONBLOCK);
-        (void) write(clientfd, line, strlen(line));
-        (void) close(clientfd);
-        clientfd = -1;
-        return;
-    }
-    if (maxip > 0U) {
-        fourinsix(&sa);
-        if (iptrack_get(&sa) >= maxip) {
-            char line[1024];
-            char hbuf[NI_MAXHOST];
-            static struct sockaddr_storage old_sa;
+    // check the client's ip address
+    // if (STORAGE_FAMILY(sa) != AF_INET && STORAGE_FAMILY(sa) != AF_INET6) {
+    //     fprintf(stderr, "[DEBUG] Here\n");
+        
+    //     (void) close(clientfd);
+    //     clientfd = -1;
+    //     return;
+    // }
 
-            (void) fcntl(clientfd, F_SETFL, fcntl(clientfd, F_GETFL) | O_NONBLOCK);
-            if (!SNCHECK(snprintf(line, sizeof line,
-                                  "421 " MSG_MAX_USERS_IP "\r\n",
-                                  (unsigned long) maxip), sizeof line)) {
-                (void) write(clientfd, line, strlen(line));
-            }
-            if (addrcmp(&old_sa, &sa) != 0) {
-                old_sa = sa;
-                if (getnameinfo((struct sockaddr *) &sa,
-                                STORAGE_LEN(sa), hbuf,
-                                sizeof hbuf, NULL, (size_t) 0U,
-                                NI_NUMERICHOST) == 0) {
-                    logfile(LOG_WARNING, MSG_MAX_USERS_IP ": [%s]",
-                            (unsigned long) maxip, hbuf);
-                }
-            }
-            (void) close(clientfd);
-            clientfd = -1;
-            return;
-        }
-    }
+    // limit the maxusers
+    // if (maxusers > 0U && nb_children >= maxusers) {
+    //     char line[1024];
+
+    //     snprintf(line, sizeof line, "421 " MSG_MAX_USERS "\r\n",
+    //              (unsigned long) maxusers);
+    //     /* No need to check a return value to say 'f*ck' */
+    //     (void) fcntl(clientfd, F_SETFL, fcntl(clientfd, F_GETFL) | O_NONBLOCK);
+    //     (void) write(clientfd, line, strlen(line));
+    //     (void) close(clientfd);
+    //     clientfd = -1;
+    //     return;
+    // }
+
+    // limit the maxip
+    // if (maxip > 0U) {
+    //     fourinsix(&sa);
+    //     if (iptrack_get(&sa) >= maxip) {
+    //         char line[1024];
+    //         char hbuf[NI_MAXHOST];
+    //         static struct sockaddr_storage old_sa;
+
+    //         (void) fcntl(clientfd, F_SETFL, fcntl(clientfd, F_GETFL) | O_NONBLOCK);
+    //         if (!SNCHECK(snprintf(line, sizeof line,
+    //                               "421 " MSG_MAX_USERS_IP "\r\n",
+    //                               (unsigned long) maxip), sizeof line)) {
+    //             (void) write(clientfd, line, strlen(line));
+    //         }
+    //         if (addrcmp(&old_sa, &sa) != 0) {
+    //             old_sa = sa;
+    //             if (getnameinfo((struct sockaddr *) &sa,
+    //                             STORAGE_LEN(sa), hbuf,
+    //                             sizeof hbuf, NULL, (size_t) 0U,
+    //                             NI_NUMERICHOST) == 0) {
+    //                 logfile(LOG_WARNING, MSG_MAX_USERS_IP ": [%s]",
+    //                         (unsigned long) maxip, hbuf);
+    //             }
+    //         }
+    //         (void) close(clientfd);
+    //         clientfd = -1;
+    //         return;
+    //     }
+    // }
+
     sigemptyset(&set);
     sigaddset(&set, SIGCHLD);
     sigprocmask(SIG_BLOCK, &set, NULL);
     nb_children++;
-    child = fork();
+
+    child = fork(); // fork here, the program use the child to solve the request
     if (child == (pid_t) 0) {
-        if (isatty(2)) {
-            (void) close(2);
-        }
+        // dont close the child's stderr.
+        // if (isatty(2)) {
+        //     (void) close(2);
+        // }
 #ifndef SAVE_DESCRIPTORS
         if (no_syslog == 0) {
             closelog();
             openlog("pure-ftpd", LOG_NDELAY | log_pid, syslog_facility);
         }
 #endif
+        // solve the request
+        fprintf(stderr, "[DEBUG] will Call the doit\n");
         doit();
+        fprintf(stderr, "[DEBUG] Has finished the doit\n");
+        fprintf(stderr, "[DEBUG] Has exit the doit\n");
         _EXIT(EXIT_SUCCESS);
     } else if (child == (pid_t) -1) {
         if (nb_children > 0U) {
@@ -5319,13 +5374,14 @@ static void accept_client(const int active_listen_fd, int fuzz_fd) {
     sigprocmask(SIG_UNBLOCK, &set, NULL);
 }
 
-static void standalone_server(int fuzz_fd)
+// try to start ftp-server
+static void standalone_server(int fuzz_fd, char * fuzz_command)
 {
     int on;
     struct addrinfo hints, *res, *res6;
     fd_set rs;
     int max_fd;
-
+    fprintf(stderr, "[DEBUG] Called standalone_server\n");
 # ifndef NO_INETD
     standalone = 1;
 # endif
@@ -5335,79 +5391,80 @@ static void standalone_server(int fuzz_fd)
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_addr = NULL;
     on = 1;
-    if (listenfd == -1 && no_ipv4 == 0 &&
-        getaddrinfo(standalone_ip, standalone_port, &hints, &res) == 0) {
-        if ((listenfd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)) == -1 ||
-            setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR,
-                       (char *) &on, sizeof on) != 0) {
-            int old_errno;
+    // cancel the bind port
+//     if (listenfd == -1 && no_ipv4 == 0 &&
+//         getaddrinfo(standalone_ip, standalone_port, &hints, &res) == 0) {
+//         if ((listenfd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)) == -1 ||
+//             setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR,
+//                        (char *) &on, sizeof on) != 0) {
+//             int old_errno;
 
-            freeaddrinfo(res);
-            cant_bind:
-            old_errno = errno;
-            perror(MSG_STANDALONE_FAILED);
-            logfile(LOG_ERR, MSG_STANDALONE_FAILED ": [%s]",
-                    strerror(old_errno));
-            return;
-        }
-# ifdef TCP_FASTOPEN
-        {
-#  ifdef __APPLE__
-            int tfo = 1;
-#  else
-            int tfo = 5;
-#  endif
-            setsockopt(listenfd, IPPROTO_TCP, TCP_FASTOPEN,
-                       (void *) &tfo, sizeof tfo);
-        }
-# endif
-        if (bind(listenfd, res->ai_addr, (socklen_t) res->ai_addrlen) != 0 ||
-            listen(listenfd, maxusers > 0U ?
-                   3U + maxusers / 8U : DEFAULT_BACKLOG) != 0) {
-            freeaddrinfo(res);
-            goto cant_bind;
-        }
-        freeaddrinfo(res);
-        set_cloexec_flag(listenfd);
-    }
-    if (listenfd6 == -1 && v6ready != 0) {
-        hints.ai_family = AF_INET6;
-        if (getaddrinfo(standalone_ip, standalone_port, &hints, &res6) == 0) {
-            if ((listenfd6 = socket(AF_INET6,
-                                    SOCK_STREAM, IPPROTO_TCP)) == -1 ||
-                setsockopt(listenfd6, SOL_SOCKET, SO_REUSEADDR,
-                           (char *) &on, sizeof on) != 0) {
-                freeaddrinfo(res6);
-                goto cant_bind;
-            }
-# if defined(IPPROTO_IPV6) && defined(IPV6_V6ONLY)
-            (void) setsockopt(listenfd6, IPPROTO_IPV6, IPV6_V6ONLY,
-                              (char *) &on, sizeof on);
-# endif
-# ifdef TCP_FASTOPEN
-            {
-                int tfo = maxusers > 0U ? 3U + maxusers / 8U : DEFAULT_BACKLOG;
-                setsockopt(listenfd6, IPPROTO_TCP, TCP_FASTOPEN,
-                           (void *) &tfo, sizeof tfo);
-            }
-# endif
-            if (bind(listenfd6, res6->ai_addr,
-                     (socklen_t) res6->ai_addrlen) != 0 ||
-                listen(listenfd6, maxusers > 0U ?
-                       3U + maxusers / 8U : DEFAULT_BACKLOG) != 0) {
-                freeaddrinfo(res6);
-                goto cant_bind;
-            }
-            freeaddrinfo(res6);
-            set_cloexec_flag(listenfd6);
-        }
-    }
-    if (listenfd == -1 && listenfd6 == -1) {
-# ifdef EADDRNOTAVAIL
-        errno = EADDRNOTAVAIL;
-# endif
-        goto cant_bind;
-    }
+//             freeaddrinfo(res);
+//             cant_bind:
+//             old_errno = errno;
+//             perror(MSG_STANDALONE_FAILED);
+//             logfile(LOG_ERR, MSG_STANDALONE_FAILED ": [%s]",
+//                     strerror(old_errno));
+//             return;
+//         }
+// # ifdef TCP_FASTOPEN
+//         {
+// #  ifdef __APPLE__
+//             int tfo = 1;
+// #  else
+//             int tfo = 5;
+// #  endif
+//             setsockopt(listenfd, IPPROTO_TCP, TCP_FASTOPEN,
+//                        (void *) &tfo, sizeof tfo);
+//         }
+// # endif
+//         if (bind(listenfd, res->ai_addr, (socklen_t) res->ai_addrlen) != 0 ||
+//             listen(listenfd, maxusers > 0U ?
+//                    3U + maxusers / 8U : DEFAULT_BACKLOG) != 0) {
+//             freeaddrinfo(res);
+//             goto cant_bind;
+//         }
+//         freeaddrinfo(res);
+//         set_cloexec_flag(listenfd);
+//     }
+//     if (listenfd6 == -1 && v6ready != 0) {
+//         hints.ai_family = AF_INET6;
+//         if (getaddrinfo(standalone_ip, standalone_port, &hints, &res6) == 0) {
+//             if ((listenfd6 = socket(AF_INET6,
+//                                     SOCK_STREAM, IPPROTO_TCP)) == -1 ||
+//                 setsockopt(listenfd6, SOL_SOCKET, SO_REUSEADDR,
+//                            (char *) &on, sizeof on) != 0) {
+//                 freeaddrinfo(res6);
+//                 goto cant_bind;
+//             }
+// # if defined(IPPROTO_IPV6) && defined(IPV6_V6ONLY)
+//             (void) setsockopt(listenfd6, IPPROTO_IPV6, IPV6_V6ONLY,
+//                               (char *) &on, sizeof on);
+// # endif
+// # ifdef TCP_FASTOPEN
+//             {
+//                 int tfo = maxusers > 0U ? 3U + maxusers / 8U : DEFAULT_BACKLOG;
+//                 setsockopt(listenfd6, IPPROTO_TCP, TCP_FASTOPEN,
+//                            (void *) &tfo, sizeof tfo);
+//             }
+// # endif
+//             if (bind(listenfd6, res6->ai_addr,
+//                      (socklen_t) res6->ai_addrlen) != 0 ||
+//                 listen(listenfd6, maxusers > 0U ?
+//                        3U + maxusers / 8U : DEFAULT_BACKLOG) != 0) {
+//                 freeaddrinfo(res6);
+//                 goto cant_bind;
+//             }
+//             freeaddrinfo(res6);
+//             set_cloexec_flag(listenfd6);
+//         }
+//     }
+//     if (listenfd == -1 && listenfd6 == -1) {
+// # ifdef EADDRNOTAVAIL
+//         errno = EADDRNOTAVAIL;
+// # endif
+//         goto cant_bind;
+//     }
     updatepidfile();
     setprocessname("pure-ftpd (SERVER)");
     FD_ZERO(&rs);
@@ -5420,18 +5477,21 @@ static void standalone_server(int fuzz_fd)
     while (stop_server == 0) {
         safe_fd_set(listenfd, &rs);
         safe_fd_set(listenfd6, &rs);
-        if (select(max_fd, &rs, NULL, NULL, NULL) <= 0) {
-            if (errno != EINTR) {
-                (void) sleep(1);
-            }
-            continue;
-        }
-        if (safe_fd_isset(listenfd, &rs)) {
-            accept_client(listenfd, fuzz_fd);
-        }
+        // if (select(max_fd, &rs, NULL, NULL, NULL) <= 0) {
+        //     if (errno != EINTR) {
+        //         (void) sleep(1);
+        //     }
+        //     continue;
+        // }
+        accept_client(listenfd, fuzz_fd, fuzz_command);
+
+        // if (safe_fd_isset(listenfd, &rs)) {
+        // }
         if (safe_fd_isset(listenfd6, &rs)) {
-            accept_client(listenfd6, fuzz_fd);
+            accept_client(listenfd6, fuzz_fd, fuzz_command);
         }
+        fprintf(stderr, "[DEBUG] has finished accept_client\n");
+        exit(1); // to end the loop.
     }
 }
 #endif
@@ -5516,19 +5576,21 @@ int pureftpd_start(int argc, char *argv[], const char *home_directory_)
 #endif
 
 #ifndef MINIMAL
+    // try to modify the program to accept a fuzz file
     int fuzz_fd; 
     if (argc == 3)
     {    
-        fuzz_fd = open(argv[2], O_RDONLY);
+        fuzz_fd = open("/dev/urandom", O_RDONLY);
+        fuzz_command = argv[2];
         if (fuzz_fd == -1)
         {
             die(421, LOG_ERR, "Unable to open fuzz file");
         }
-        fprintf(stderr, "Fuzzing with file %d\n", fuzz_fd);  
+        fprintf(stderr, "[DEBUG] Fuzzing command is %s\n", fuzz_command);  
         argc --;
     }
     else{
-        die(421, LOG_ERR, "Usage: pure-ftpd <configuration file> <fuzz file>");
+        die(421, LOG_ERR, "Usage: pure-ftpd <configuration file> <fuzz command>");
     }
     
     if (argc == 2 && *argv[1] != '-' &&
@@ -6172,7 +6234,9 @@ int pureftpd_start(int argc, char *argv[], const char *home_directory_)
         first_authentications->next = NULL;
     }
 #ifndef NO_STANDALONE
+    // here has fork a child
     dodaemonize();
+
 #endif
 #ifndef SAVE_DESCRIPTORS
     if (no_syslog == 0 && (log_pid || syslog_facility != DEFAULT_FACILITY)) {
@@ -6181,7 +6245,7 @@ int pureftpd_start(int argc, char *argv[], const char *home_directory_)
     }
 #endif
     (void) umask((mode_t) 0);
-    clearargs(argc, argv);
+    // clearargs(argc, argv); // has vuln here.
     idletime_noop = (double) idletime * 2.0;
     if (firstport) {
         unsigned int portmax;
@@ -6211,7 +6275,9 @@ int pureftpd_start(int argc, char *argv[], const char *home_directory_)
 #endif
 #if !defined(NO_STANDALONE) && !defined(NO_INETD)
     if (check_standalone() != 0) {
-        standalone_server(fuzz_fd);
+        standalone_server(fuzz_fd, fuzz_command);
+        fprintf(stderr, "[DEBUG] Has finished the standalone_server\n");
+        // exit(1);
     } else {
         doit();
     }

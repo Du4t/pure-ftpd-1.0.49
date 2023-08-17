@@ -67,7 +67,7 @@ int main(void)
             putchar(ZIPPER[t]);
             putchar('\b');
             fflush(stdout);
-            (void) sleep(1U);
+            // (void) sleep(1U);
             t++;
         } while (t < sizeof ZIPPER - (size_t) 1U);
         putchar('\n');

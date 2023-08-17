@@ -37,7 +37,7 @@ static int upload_pipe_ropen(void)
          open(UPLOAD_PIPE_FILE, O_RDONLY | O_NOFOLLOW)) == -1) {
         if (tries > 0) {
             tries--;
-            (void) sleep(OPEN_DELAY);
+            // (void) sleep(OPEN_DELAY);
             goto again;
         }
         perror("Unable to open " UPLOAD_PIPE_FILE);
@@ -489,7 +489,7 @@ int main(int argc, char *argv[])
 #endif
     for (;;) {
         if (readpipe(upload_pipe_fd, &who, &file) != 0) {
-            (void) sleep(1);
+            // (void) sleep(1);
             continue;
         }
         file = checkvirtual(file);

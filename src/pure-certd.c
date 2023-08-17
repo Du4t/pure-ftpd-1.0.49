@@ -363,7 +363,7 @@ int listencnx(void)
             if (exit_certd != 0) {
                 break;
             }
-            (void) sleep(1);
+            // (void) sleep(1);
             continue;
         }
         setcloexec(clientfd);

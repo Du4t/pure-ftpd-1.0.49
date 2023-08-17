@@ -201,13 +201,13 @@ AUTOHEADER = ${SHELL} /media/psf/Home/Desktop/Fuzz/Binarys/pure-ftpd-1.0.49/miss
 AUTOMAKE = ${SHELL} /media/psf/Home/Desktop/Fuzz/Binarys/pure-ftpd-1.0.49/missing automake-1.16
 AWK = mawk
 BONJOUR_LDADD = 
-CC = gcc
+CC = afl-clang-fast
 CCDEPMODE = depmode=gcc3
 CFLAGS = -g -O2 -fPIC -fPIE -fwrapv -fno-strict-aliasing -fno-strict-overflow -fstack-protector-all -Winit-self -Wwrite-strings -Wdiv-by-zero -Wno-unused-command-line-argument
 CONFDIR = /home/du4t/pure-ftpd/etc
-CPP = gcc -E
+CPP = afl-clang-fast -E
 CPPFLAGS =  -I/usr/local/include -D_FORTIFY_SOURCE=2 -DCONFDIR=\"/home/du4t/pure-ftpd/etc\" -DSTATEDIR=\"/var\"
-CWFLAGS =  -Wall -Wextra -Wbad-function-cast -Wcast-align -Wcast-qual -Wchar-subscripts -Wcomment -Wfloat-equal -Wformat=2 -Wimplicit -Wmissing-declarations -Wmissing-prototypes -Wnormalized=id -Woverride-init -Wparentheses -Wpointer-arith -Wredundant-decls -Wstrict-prototypes -Wswitch-enum
+CWFLAGS =  -Wall -Wextra -Wbad-function-cast -Wcast-align -Wcast-qual -Wchar-subscripts -Wcomment -Wfloat-equal -Wformat=2 -Wimplicit -Wmissing-declarations -Wmissing-prototypes -Wnormalized=id -Woverride-init -Wparentheses -Wpointer-arith -Wredundant-decls -Wstrict-prototypes -Wswitch-enum -Wvariable-decl
 CYGPATH_W = echo
 DEFS = -DHAVE_CONFIG_H
 DEPDIR = .deps
@@ -253,7 +253,7 @@ abs_builddir = /media/psf/Home/Desktop/Fuzz/Binarys/pure-ftpd-1.0.49/puredb/src
 abs_srcdir = /media/psf/Home/Desktop/Fuzz/Binarys/pure-ftpd-1.0.49/puredb/src
 abs_top_builddir = /media/psf/Home/Desktop/Fuzz/Binarys/pure-ftpd-1.0.49
 abs_top_srcdir = /media/psf/Home/Desktop/Fuzz/Binarys/pure-ftpd-1.0.49
-ac_ct_CC = gcc
+ac_ct_CC = afl-clang-fast
 am__include = include
 am__leading_dot = .
 am__quote = 

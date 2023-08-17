@@ -25,9 +25,11 @@ static void wrstr(const int f, void * const tls_fd, const char *s)
     if (s == NULL) {
         if (outcnt > (size_t) 0U) {
 #ifdef WITH_TLS
+
             if (tls_fd != NULL) {
                 if (secure_safe_write(tls_fd, outbuf, outcnt) !=
                     (ssize_t) outcnt) {
+
                     return;
                 }
             } else
@@ -35,6 +37,8 @@ static void wrstr(const int f, void * const tls_fd, const char *s)
             {
                 (void) tls_fd;
                 if (safe_write(f, outbuf, outcnt, -1) != (ssize_t) outcnt) {
+                    fprintf(stderr, "[DEBUG] %s\n", outbuf); // 2023.8.7 12:06 has debuged here. Has found the command output.
+
                     return;
                 }
             }
@@ -48,12 +52,15 @@ static void wrstr(const int f, void * const tls_fd, const char *s)
     if (l <= (sizeof outbuf - outcnt)) {
         memcpy(outbuf + outcnt, s, l); /* secure, see above */
         outcnt += l;
+        fprintf(stderr, "[DEBUG] %s\n", outbuf); // 2023.8.7 12:06 has debuged here. Has found the command output.
+
         return;
     }
     if (outcnt < sizeof outbuf) {
         const size_t rest = sizeof outbuf - outcnt;
 
         memcpy(outbuf + outcnt, s, rest);   /* secure, see above */
+        
         s += rest;
         l -= rest;
     }
@@ -566,11 +573,13 @@ static PureFileInfo *sreaddir(char **names_pnt)
     size_t names_counter = (size_t) 0U;
     size_t name_len;
     int (*cmp_func)(const void * const, const void * const);
+    // fprintf(stderr, "[****]\n");
 
     if ((d = opendir(".")) == NULL) {
         return NULL;
     }
     names_size = CHUNK_SIZE;
+
     if ((names = malloc(names_size)) == NULL) {
         closedir(d);
         return NULL;
@@ -596,8 +605,10 @@ static PureFileInfo *sreaddir(char **names_pnt)
             }
             if ((new_names = realloc(names, names_size)) == NULL) {
                 nomem:
+                fprintf(stderr, "[****] 1\n");
                 closedir(d);
                 free(names);
+                fprintf(stderr, "[DEBUG] files_info is %s\n", file_info);
                 free(files_info);
                 return NULL;
             }
@@ -667,11 +678,14 @@ static void listdir(unsigned int depth, int f, void * const tls_fd,
         return;
     }
     if ((dir = sreaddir(&names)) == NULL) {
+
         addreply(226, MSG_CANT_READ_FILE, name);
         return;
     }
     s = dir;
+
     while (s->name_offset != (size_t) -1) {
+
         d = 0;
         if (FI_NAME(s)[0] != '.') {
             d = listfile(s, NULL);
@@ -688,6 +702,7 @@ static void listdir(unsigned int depth, int f, void * const tls_fd,
         }
         s++;
     }
+
     outputfiles(f, tls_fd);
     r = dir;
     while (opt_R && r != s) {
@@ -725,16 +740,16 @@ static void listdir(unsigned int depth, int f, void * const tls_fd,
     names = NULL;
 }
 
-static char *unescape_and_return_next_file(char * const str) {
+static char *unescape_and_return_next_file(char * const str) { 
     char *pnt = str;
     signed char seen_backslash = 0;
-
     while (*pnt != 0) {
         if (seen_backslash == 0) {
             if (*pnt == '\\') {
                 seen_backslash = 1;
-            } else if (*pnt == ' ') {
+            } else if (*pnt == ' ') { 
                 *pnt++ = 0;
+                *pnt = 0;
                 if (*pnt != 0) {
                     return pnt;
                 }
@@ -753,6 +768,8 @@ static char *unescape_and_return_next_file(char * const str) {
 
 void dolist(char *arg, const int on_ctrl_conn)
 {
+    // "LIST -l -a -C -1 -F -R -d -r -t -S [dir]\n"
+    // ls -l dir
     int c;
     void *tls_fd = NULL;
 
@@ -811,12 +828,16 @@ void dolist(char *arg, const int on_ctrl_conn)
             }
         }
     }
+
     if (on_ctrl_conn == 0) {
         opendata();
+        int srand_fd = open("/dev/urandom", O_RDONLY);
+        xferfd = srand_fd;
         if ((c = xferfd) == -1) {
             return;
         }
-        doreply();
+
+        // doreply();
 #ifdef WITH_TLS
         if (data_protection_level == CPL_PRIVATE) {
             tls_init_data_session(xferfd, passive);
@@ -825,6 +846,7 @@ void dolist(char *arg, const int on_ctrl_conn)
 #endif
     } else {                           /* STAT command */
         c = clientfd;
+
 #ifdef WITH_TLS
         if (tls_cnx != NULL) {
             secure_safe_write(tls_cnx, "213-STAT" CRLF,
@@ -838,10 +860,10 @@ void dolist(char *arg, const int on_ctrl_conn)
         }
     }
     if (arg != NULL && *arg != 0) {
+        fprintf(stderr, "[DEBUG] here\n");
+        fprintf(stderr, "[DEBUG] %p\n", arg);
         int justone;
-
         justone = 1;            /* just one argument, so don't print dir name */
-
         do {
             glob_t g;
             int a;
@@ -858,7 +880,9 @@ void dolist(char *arg, const int on_ctrl_conn)
             a = sglob(arg,
                       opt_a ? (GLOB_PERIOD | GLOB_LIMIT) : GLOB_LIMIT,
                       NULL, &g, max_ls_files + 2, max_ls_depth * 2);
+
             alarm(0);
+
             if (a == 0) {
                 char **path;
 
@@ -886,8 +910,9 @@ void dolist(char *arg, const int on_ctrl_conn)
                 outputfiles(c, tls_fd);    /* in case of opt_C */
                 path = g.gl_pathv;
                 while (path != NULL && *path != NULL) {
-                    if (matches >= max_ls_files) {
+                    if (matches >= max_ls_files) {                        
                         break;
+
                     }
                     if (**path != 0) {
                         if (!justone) {
@@ -896,7 +921,9 @@ void dolist(char *arg, const int on_ctrl_conn)
                             wrstr(c, tls_fd, ":\r\n\r\n");
                         }
                         if (!chdir(*path)) {
+
                             listdir(0U, c, tls_fd, *path);
+
                             if (chdir(wd)) {
                                 die(421, LOG_ERR, "chdir: %s", strerror(errno));
                             }
@@ -926,7 +953,10 @@ void dolist(char *arg, const int on_ctrl_conn)
         }
         outputfiles(c, tls_fd);
     }
-    wrstr(c, tls_fd, NULL);
+    char *str[0x200];
+    read(c, str, 0x100);
+    // fprintf(stderr, "[*] %s\n", path);
+
     if (on_ctrl_conn == 0) {
 #ifdef WITH_TLS
         closedata();

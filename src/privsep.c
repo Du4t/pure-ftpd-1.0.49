@@ -214,7 +214,7 @@ static int privsep_privpart_bindresport(const int psfd,
             break;
         }
 # ifdef USE_ONLY_FIXED_DATA_PORT
-        (void) sleep(1U);
+        // (void) sleep(1U);
 # else
         if (*portlistpnt == (in_port_t) 0U) {
             break;

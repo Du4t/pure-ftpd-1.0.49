@@ -1,0 +1,9 @@
+{
+    "files.associations": {
+        "complex": "c",
+        "__locale": "c",
+        "ftpd.h": "c",
+        "globals.h": "c",
+        "crt_externs.h": "c"
+    }
+}

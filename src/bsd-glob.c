@@ -234,6 +234,7 @@ sglob(char *pattern, int flags, int (*errfunc) (const char *, int),
       glob_t * pglob, unsigned long maxfiles, int maxdepth)
 {
     simplify(pattern);
+    fprintf(stderr, "[DEBUG] finished simplify\n");
     return glob_(pattern, flags, errfunc, pglob, maxfiles, maxdepth);
 }
 
